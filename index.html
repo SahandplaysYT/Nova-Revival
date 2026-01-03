@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaRevival</title>
+    <style>
+        body {
+            margin: 0; padding: 0; font-family: Arial, sans-serif;
+            background: url('https://www.themebeta.com/thumbnail/728/1113207/files/chrome/images/201607/08/a7e9a6aa6caf76e019e27cacd48ef143.webp') no-repeat center center fixed;
+            background-size: cover; height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.95); padding: 40px; border-radius: 12px; text-align: center; max-width: 420px; box-shadow: 0 0 30px rgba(0,0,0,0.4);
+        }
+        h1 { font-size: 60px; margin: 0 0 10px; }
+        h2 { font-size: 22px; margin: 0 0 30px; }
+        h3 { font-size: 24px; margin: 30px 0 15px; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #808080; color: white; border: none; border-radius: 6px; font-size: 18px; cursor: pointer; margin: 15px 0; }
+        button:hover { opacity: 0.9; }
+        .gender { display: flex; justify-content: space-around; margin: 15px 0; }
+        .gender label { font-size: 16px; }
+        p { color: #666; margin-top: 20px; }
+        a { color: #0066FF; text-decoration: underline; }
+        /* Verification Popup */
+        #verifyPopup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 100;
+        }
+        #verifyPopup .inner {
+            background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px;
+        }
+        #verifyPopup button { width: auto; padding: 12px 24px; margin: 10px 5px; }
+        #verifyPopup button.cancel { background: #ccc; }
+        #verifyMsg { color: red; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NovaRevival</h1>
+        <h2>Powering Imagination™</h2>
+        <h3>SIGN UP AND START HAVING FUN!</h3>
+       
+        <input id="username" type="text" placeholder="Username (length 3-20, _ is allowed)">
+        <input id="password" type="password" placeholder="Password (minimum length 8)">
+        <input id="confirm" type="password" placeholder="Confirm Password">
+       
+        <div style="display: flex; gap: 10px;">
+            <select id="month">
+                <option>Month</option>
+                <option>January</option><option>February</option><option>March</option><option>April</option>
+                <option>May</option><option>June</option><option>July</option><option>August</option>
+                <option>September</option><option>October</option><option>November</option><option>December</option>
+            </select>
+            <select id="day"><option>Day</option><!-- days --></select>
+            <select id="year"><option>Year</option><!-- years --></select>
+        </div>
+       
+        <div class="gender">
+            <label><input type="radio" name="gender" value="male"> Male</label>
+            <label><input type="radio" name="gender" value="female"> Female</label>
+            <label><input type="radio" name="gender" value="other"> Other</label>
+        </div>
+       
+        <button onclick="startSignup()">Sign Up</button>
+       
+        <p>Already have an account? <a href="login.html">Log In</a></p>
+    </div>
+
+    <!-- Human Verification Popup -->
+    <div id="verifyPopup">
+        <div class="inner">
+            <h2>Verify You're Human</h2>
+            <p><label><input type="checkbox" id="notRobot"> I'm not a robot</label></p>
+            <p id="mathQuestion">What is ? + ? = ?</p>
+            <input type="text" id="mathAnswer" placeholder="Your answer" size="10">
+            <br>
+            <button onclick="checkHuman()">Submit</button>
+            <button class="cancel" onclick="closePopup()">Cancel</button>
+            <p id="verifyMsg"></p>
+        </div>
+    </div>
+
+    <script>
+        // === AUTO-REDIRECT IF ALREADY LOGGED IN ===
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '[]');
+            if (bannedUsers.includes(currentUser)) {
+                alert('Your account is permanently banned.');
+                localStorage.removeItem('currentUser');
+            } else {
+                window.location.href = 'home.html';
+            }
+        }
+
+        let tempData = {};
+
+        function startSignup() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm').value;
+
+            if (!username || !password || !confirm) {
+                alert('Please fill in all required fields!');
+                return;
+            }
+            if (username.length < 3 || username.length > 20) {
+                alert('Username must be 3-20 characters long!');
+                return;
+            }
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters!');
+                return;
+            }
+            if (password !== confirm) {
+                alert('Passwords do not match!');
+                return;
+            }
+            if (localStorage.getItem(username)) {
+                alert('Username is already taken!');
+                return;
+            }
+
+            tempData = { username, password };
+
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            tempData.correctAnswer = num1 + num2;
+
+            document.getElementById('mathQuestion').innerText = `What is ${num1} + ${num2} = ?`;
+            document.getElementById('mathAnswer').value = '';
+            document.getElementById('verifyMsg').innerText = '';
+            document.getElementById('notRobot').checked = false;
+            document.getElementById('verifyPopup').style.display = 'flex';
+        }
+
+        function checkHuman() {
+            const notRobot = document.getElementById('notRobot').checked;
+            const answer = document.getElementById('mathAnswer').value.trim();
+
+            if (!notRobot) {
+                document.getElementById('verifyMsg').innerText = 'Please check "I\'m not a robot"';
+                return;
+            }
+            if (answer !== String(tempData.correctAnswer)) {
+                document.getElementById('verifyMsg').innerText = 'Wrong answer! Try again.';
+                return;
+            }
+
+            // Create account and auto-login
+            localStorage.setItem(tempData.username, JSON.stringify({ pass: tempData.password }));
+            localStorage.setItem('currentUser', tempData.username);
+
+            closePopup();
+            alert('Account created successfully! Welcome to NovaRevival!');
+            window.location.href = 'home.html';
+        }
+
+        function closePopup() {
+            document.getElementById('verifyPopup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
