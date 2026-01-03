@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaRevival - Home</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000 url('https://www.themebeta.com/thumbnail/728/1113207/files/chrome/images/201607/08/a7e9a6aa6caf76e019e27cacd48ef143.webp') fixed center/cover; color: white; font-family: Arial, sans-serif; min-height: 100vh; }
+        .topbar-black { background: #1a1a1a; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-bottom: 1px solid #333; }
+        .nav-links a { color: white; text-decoration: none; margin: 0 15px; font-size: 18px; }
+        .nav-links a:hover { text-decoration: underline; }
+        .search-bar { background: #333; border: none; padding: 10px; border-radius: 20px; width: 300px; color: white; }
+        .top-right-icons { display: flex; align-items: center; gap: 20px; font-size: 24px; }
+        .currency { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 18px; }
+        .currency img { width: 28px; height: 28px; }
+        .robux-amount { color: #00FF00; }
+        .tix-amount { color: #FFD700; }
+        .notification-bell img { width: 28px; height: 28px; vertical-align: middle; }
+        .notification-bell { position: relative; cursor: pointer; }
+
+        /* Dropdown menu */
+        .settings-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px 0;
+            min-width: 140px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 200;
+        }
+        .settings-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .settings-dropdown button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .orange-banner { background: #FFA500; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 18px; position: fixed; top: 60px; left: 220px; right: 0; z-index: 99; }
+        .sidebar { position: fixed; left: 0; top: 60px; bottom: 0; width: 220px; background: #1a1a1a; padding: 20px 0; overflow-y: auto; }
+        .sidebar a { display: block; padding: 15px 20px; color: #ccc; text-decoration: none; font-size: 18px; }
+        .sidebar a:hover { background: rgba(255,165,0,0.2); }
+        .sidebar .admin-link { display: none; color: #FF0000; font-weight: bold; }
+        .sidebar .upgrade { background: #000; color: white; margin: 20px; padding: 15px; text-align: center; border: 2px solid white; font-weight: bold; font-size: 18px; }
+        .main { margin-left: 240px; margin-top: 100px; padding: 20px; min-height: calc(100vh - 100px); }
+        .profile-section { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid white; object-fit: cover; }
+        .greeting { font-size: 36px; display: flex; align-items: center; gap: 10px; }
+        .verified-check { width: 32px; height: 32px; vertical-align: middle; }
+        .section { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; margin-bottom: 30px; max-width: 800px; }
+        .section-title { font-size: 24px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .friends-list { display: flex; flex-wrap: wrap; gap: 15px; }
+        .friend { text-align: center; }
+        .friend-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid green; object-fit: cover; }
+        .friend-name { font-size: 14px; margin-top: 5px; }
+        .no-friends { text-align: center; font-size: 18px; color: #aaa; padding: 20px; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .game-thumb { height: 120px; background: #333 center/cover no-repeat; border-radius: 8px; display: flex; align-items: flex-end; justify-content: center; padding: 10px; font-weight: bold; font-size: 14px; }
+        .feed {
+            max-width: 600px;
+            padding: 15px;
+            margin-top: 80px;
+            margin-bottom: 50px;
+        }
+        .feed .section-title { font-size: 20px; }
+        .bottom-chat { position: fixed; bottom: 20px; right: 20px; background: #0066FF; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <!-- Black Top Bar -->
+    <div class="topbar-black">
+        <div class="nav-links">
+            <a href="#">Games</a>
+            <a href="catalog.html">Catalog</a>
+            <a href="#">Create</a>
+            <a href="#">Download</a>
+        </div>
+        <input type="text" class="search-bar" placeholder="Search">
+        <div class="top-right-icons">
+            <span id="usernameDisplay">Guest</span>
+            <div class="currency">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Robux_2019_Logo_gold.svg/800px-Robux_2019_Logo_gold.svg.png" alt="Robux">
+                <span id="robuxAmount" class="robux-amount">0</span>
+            </div>
+            <div class="currency">
+                <img src="https://tr.rbxcdn.com/e0d943e9fdaa48c32c5f29d69e66166c/420/420/Image/Png" alt="Tix">
+                <span id="tixAmount" class="tix-amount">0</span>
+            </div>
+            <div class="notification-bell" id="settingsIcon">
+                <img src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png" alt="Settings">
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Dropdown -->
+    <div class="settings-dropdown" id="settingsDropdown">
+        <button onclick="signOut()">Sign out</button>
+        <button onclick="goToSettings()">Settings</button>
+    </div>
+
+    <!-- Orange Banner -->
+    <div class="orange-banner">
+        Hey, hey you! Copy the link to join the discord server: https://discord.gg/mrnwrdXgSa
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="home.html">Home</a>
+        <a href="#">Profile</a>
+        <a href="#">Messages</a>
+        <a href="#">Friends</a>
+        <a href="#">Avatar</a>
+        <a href="#">Inventory</a>
+        <a href="#">Trade</a>
+        <a href="#">Groups</a>
+        <a href="#">Forums</a>
+        <a href="#">Redeem</a>
+        <a href="admin.html" class="admin-link">ADMIN</a>
+        <div class="upgrade">Upgrade Now</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <div class="profile-section">
+            <img src="https://via.placeholder.com/120/333333/ffffff?text=No+Avatar" class="avatar" alt="User Avatar">
+            <div class="greeting">
+                Hello, <span id="usernameDisplay2">Guest</span>
+                <img id="verifiedBadge" src="" class="verified-check" alt="Verified" style="display:none;">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Friends Online (0)</div>
+            <div class="no-friends">No friends online yet. Add some!</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Recently Played</div>
+            <div class="no-friends">No recently played games.</div>
+        </div>
+
+        <div class="section feed">
+            <div class="section-title">MY FEED</div>
+            <div style="text-align:center; font-size:18px; color:#aaa;">Nothing here yet!</div>
+        </div>
+    </div>
+
+    <div class="bottom-chat">Chat</div>
+
+    <script>
+        // Toggle dropdown on click
+        document.getElementById('settingsIcon').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('settingsDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', function() {
+            document.getElementById('settingsDropdown').style.display = 'none';
+        });
+
+        // Sign out function
+        function signOut() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+
+        // Settings function (placeholder - change to your settings page)
+        function goToSettings() {
+            alert('Settings page coming soon!');
+            // Or redirect: window.location.href = 'settings.html';
+        }
+
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            alert('Not logged in! Redirecting to login...');
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('usernameDisplay').innerText = currentUser;
+            document.getElementById('usernameDisplay2').innerText = currentUser;
+            const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+            const robux = userData.robux || 0;
+            const tix = userData.tix || 0;
+            function abbreviateNumber(num) {
+                if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+                return num.toString();
+            }
+            document.getElementById('robuxAmount').innerText = abbreviateNumber(robux);
+            document.getElementById('tixAmount').innerText = abbreviateNumber(tix);
+            if (userData.verified) {
+                document.getElementById('verifiedBadge').src = 'https://tr.rbxcdn.com/1495c39aa26ad471b7876caefde4f73c/420/420/Image/Png';
+                document.getElementById('verifiedBadge').style.display = 'inline';
+            }
+        }
+        const admins = ['TestUser', 'tinypuurs', 'NovaRevival'];
+        if (admins.includes(currentUser)) {
+            document.querySelector('.admin-link').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
