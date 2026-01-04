@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaRevival - Admin Panel</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000 url('https://www.themebeta.com/thumbnail/728/1113207/files/chrome/images/201607/08/a7e9a6aa6caf76e019e27cacd48ef143.webp') fixed center/cover;
+            color: white;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+            border-bottom: 1px solid #333;
+        }
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+        }
+        .close-btn:hover { color: white; }
+        /* Improved sidebar buttons */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            bottom: 0;
+            width: 200px;
+            background: rgba(20,20,20,0.95);
+            padding: 20px 15px;
+            border-right: 1px solid #333;
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+        }
+        .sidebar button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #333, #444);
+            color: white;
+            border: none;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            touch-action: manipulation;
+            position: relative;
+        }
+        .sidebar button:hover {
+            background: linear-gradient(135deg, #555, #666);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .sidebar button:active {
+            transform: translateY(0);
+        }
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: #FF0000;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .main {
+            margin-left: 220px;
+            margin-top: 80px;
+            padding: 40px;
+            min-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        input, textarea {
+            padding: 12px;
+            width: 320px;
+            margin: 10px 0;
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button.action {
+            background: #FF6A00;
+            padding: 14px 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        button.danger {
+            background: #FF0000;
+        }
+        button.remove {
+            background: #CC0000;
+        }
+        button.secondary {
+            background: #0066FF;
+        }
+        button.approve {
+            background: #00AA00;
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 20px;
+            padding: 20px;
+            background: rgba(0,255,0,0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        /* Upload form layout - simple stacked */
+        .upload-form {
+            max-width: 600px;
+        }
+        /* Catalog Management - Smaller containing container with orange stroke */
+        .catalog-container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(34, 34, 34, 0.8);
+            border-radius: 12px;
+            border: 4px solid #FF6A00;
+            box-shadow: 0 0 20px rgba(255, 106, 0, 0.3);
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .catalog-item {
+            background: #222;
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+        .catalog-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            background: #333;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .catalog-item-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .catalog-item-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .catalog-item-details {
+            font-size: 15px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .catalog-item-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            min-width: 170px;
+        }
+        .catalog-item-controls input {
+            width: auto;
+            padding: 7px;
+            font-size: 14px;
+        }
+        .catalog-item-controls button {
+            padding: 7px;
+            font-size: 13px;
+        }
+        .status-onsale { color: #00ff00; font-weight: bold; }
+        .status-offsale { color: #ff6666; font-weight: bold; }
+        .status-pending { color: #ffaa00; font-weight: bold; }
+        .item-new {
+            border: 3px solid #ffcc00;
+        }
+        .item-limited {
+            border: 3px solid #ff6600;
+        }
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 30px 0;
+            font-size: 18px;
+        }
+        .pagination button {
+            background: #333;
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+        .pagination button:disabled {
+            background: #222;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .page-input {
+            width: 80px;
+            text-align: center;
+            padding: 10px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+        }
+        /* Mobile improvements */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-radius: 0;
+                border-right: none;
+            }
+            .main {
+                margin-left: 0;
+                margin-top: 60px;
+            }
+            .sidebar button {
+                padding: 16px;
+                font-size: 18px;
+            }
+            .catalog-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px;
+            }
+            .catalog-item img {
+                align-self: center;
+            }
+            .catalog-item-controls {
+                width: 100%;
+            }
+            .catalog-container {
+                max-width: 100%;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Admin Panel</h2>
+        <div class="close-btn" onclick="window.location.href='home.html'">✕</div>
+    </div>
+    <div class="sidebar">
+        <button onclick="showSection('verify')">Make Verified</button>
+        <button onclick="showSection('unverify')">Remove Verified</button>
+        <button onclick="showSection('ban')">Ban / Terminate</button>
+        <button onclick="showSection('delete')">Delete User</button>
+        <button onclick="showSection('robux')">Add Robux</button>
+        <button onclick="showSection('removerobux')">Remove Robux</button>
+        <button onclick="showSection('tix')">Add Tix</button>
+        <button onclick="showSection('removetix')">Remove Tix</button>
+        <button onclick="showSection('additem')">Upload Item</button>
+        <button onclick="showSection('managecatalog')">Manage Catalog</button>
+        <button onclick="showSection('grantadmin')">Grant Admin Access</button>
+        <button onclick="showSection('pendinguploads')" id="pendingBtn">
+            Pending Uploads
+            <span class="notification-badge" id="pendingCount" style="display:none;">0</span>
+        </button>
+    </div>
+    <div class="main">
+        <!-- Make Verified -->
+        <div id="verify" class="section active">
+            <h2>Make Verified</h2>
+            <input id="verifyUser" placeholder="Username">
+            <button class="action" onclick="makeVerified()">Make Verified</button>
+        </div>
+        <!-- Remove Verified -->
+        <div id="unverify" class="section">
+            <h2>Remove Verified</h2>
+            <input id="unverifyUser" placeholder="Username">
+            <button class="action" onclick="removeVerified()">Remove Verified</button>
+        </div>
+        <!-- Ban / Terminate -->
+        <div id="ban" class="section">
+            <h2>Ban / Terminate User (Permanent)</h2>
+            <input id="banUser" placeholder="Username">
+            <button class="action danger" onclick="banUser()">Ban User</button>
+            <p style="font-size:14px; color:#aaa;">Banned users cannot log in ever again.</p>
+        </div>
+        <!-- Delete User -->
+        <div id="delete" class="section">
+            <h2>Delete User Account</h2>
+            <input id="deleteUser" placeholder="Username">
+            <button class="action danger" onclick="deleteUser()">Delete Account</button>
+            <p style="font-size:14px; color:#aaa;">This completely removes the account. They can re-register with the same name.</p>
+        </div>
+        <!-- Add Robux -->
+        <div id="robux" class="section">
+            <h2>Add Robux</h2>
+            <input id="robuxUser" placeholder="Username">
+            <input id="robuxAmount" type="number" placeholder="Amount">
+            <button class="action" onclick="giveRobux()">Give Robux</button>
+        </div>
+        <!-- Remove Robux -->
+        <div id="removerobux" class="section">
+            <h2>Remove Robux</h2>
+            <input id="removeRobuxUser" placeholder="Username">
+            <input id="removeRobuxAmount" type="number" placeholder="Amount">
+            <button class="action remove" onclick="removeRobux()">Remove Robux</button>
+        </div>
+        <!-- Add Tix -->
+        <div id="tix" class="section">
+            <h2>Add Tix</h2>
+            <input id="tixUser" placeholder="Username">
+            <input id="tixAmount" type="number" placeholder="Amount">
+            <button class="action" onclick="giveTix()">Give Tix</button>
+        </div>
+        <!-- Remove Tix -->
+        <div id="removetix" class="section">
+            <h2>Remove Tix</h2>
+            <input id="removeTixUser" placeholder="Username">
+            <input id="removeTixAmount" type="number" placeholder="Amount">
+            <button class="action remove" onclick="removeTix()">Remove Tix</button>
+        </div>
+        <!-- Upload Item Section -->
+        <div id="additem" class="section">
+            <h2>Upload New Item to Catalog</h2>
+            <div class="upload-form">
+                <input id="itemName" placeholder="Item Name">
+                <input id="itemImage" placeholder="Image URL (e.g. Roblox asset link)">
+                <textarea id="itemDesc" placeholder="Item Description (optional)"></textarea>
+                <input id="itemRobux" type="number" placeholder="Robux Price (0 = free)">
+                <input id="itemTix" type="number" placeholder="Tix Price (optional)">
+                <label>
+                    <input type="checkbox" id="itemNew"> Mark as NEW
+                </label>
+                <br><br>
+                <label>
+                    <input type="checkbox" id="itemLimited" onchange="toggleStockField()"> Mark as LIMITED
+                </label>
+                <br><br>
+                <input id="itemStock" type="number" min="1" max="1500" placeholder="Stock (1-1500)" style="display:none;">
+                <br><br>
+                <button class="action" onclick="addCatalogItem()">Upload Item</button>
+            </div>
+        </div>
+        <!-- Manage Catalog Section -->
+        <div id="managecatalog" class="section">
+            <h2>Manage Catalog Items</h2>
+            <div class="catalog-container">
+                <div id="catalogGrid" class="catalog-grid">
+                    <!-- Items loaded dynamically -->
+                </div>
+                <div class="pagination" id="paginationControls">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+        <!-- Pending Uploads Section -->
+        <div id="pendinguploads" class="section">
+            <h2>Pending Item Uploads</h2>
+            <div class="catalog-container">
+                <div id="pendingGrid" class="catalog-grid">
+                    <!-- Pending items loaded dynamically -->
+                </div>
+            </div>
+        </div>
+        <!-- NEW: Grant Admin Access Section -->
+        <div id="grantadmin" class="section">
+            <h2>Grant Admin Panel Access</h2>
+            <input id="adminUser" placeholder="Username">
+            <button class="action secondary" onclick="grantAdmin()">Grant Admin Access</button>
+        </div>
+        <p id="result"></p>
+    </div>
+    <script>
+        const currentUser = localStorage.getItem('currentUser');
+        const admins = ['TestUser', 'NovaRevival', 'tinypuurs', 'nova.revival', 'fuckyou'];
+        if (!admins.includes(currentUser)) {
+            alert('Access Denied! Admins only.');
+            window.location.href = 'home.html';
+        }
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('result').innerText = '';
+            if (id === 'managecatalog') loadCatalogPage(1);
+            if (id === 'pendinguploads') loadPendingUploads();
+        }
+        // === ALL ADMIN FUNCTIONS (now fully restored and working) ===
+        function makeVerified() {
+            const user = document.getElementById('verifyUser').value.trim();
+            if (!user) return alert('Enter a username');
+            let data = JSON.parse(localStorage.getItem(user) || '{}');
+            data.verified = true;
+            localStorage.setItem(user, JSON.stringify(data));
+            document.getElementById('result').innerText = `${user} is now verified!`;
+        }
+        function removeVerified() {
+            const user = document.getElementById('unverifyUser').value.trim();
+            if (!user) return alert('Enter a username');
+            let data = JSON.parse(localStorage.getItem(user) || '{}');
+            delete data.verified;
+            localStorage.setItem(user, JSON.stringify(data));
+            document.getElementById('result').innerText = `${user}'s verified status removed!`;
+        }
+        function banUser() {
+            const user = document.getElementById('banUser').value.trim();
+            if (!user) return alert('Enter a username');
+            if (confirm(`Permanently ban ${user}?`)) {
+                let banned = JSON.parse(localStorage.getItem('bannedUsers') || '[]');
+                if (!banned.includes(user)) banned.push(user);
+                localStorage.setItem('bannedUsers', JSON.stringify(banned));
+                document.getElementById('result').innerText = `${user} has been permanently banned!`;
+            }
+        }
+        function deleteUser() {
+            const user = document.getElementById('deleteUser').value.trim();
+            if (!user) return alert('Enter a username');
+            if (confirm(`Delete ${user}'s account?`)) {
+                localStorage.removeItem(user);
+                let banned = JSON.parse(localStorage.getItem('bannedUsers') || '[]');
+                banned = banned.filter(u => u !== user);
+                localStorage.setItem('bannedUsers', JSON.stringify(banned));
+                document.getElementById('result').innerText = `${user}'s account has been deleted!`;
+            }
+        }
+        function giveRobux() {
+            const user = document.getElementById('robuxUser').value.trim();
+            const amount = parseInt(document.getElementById('robuxAmount').value);
+            if (!user || isNaN(amount) || amount <= 0) return alert('Invalid input');
+            let data = JSON.parse(localStorage.getItem(user) || '{}');
+            data.robux = (data.robux || 0) + amount;
+            localStorage.setItem(user, JSON.stringify(data));
+            document.getElementById('result').innerText = `Gave ${amount} Robux to ${user}!`;
+        }
+        function removeRobux() {
+            const user = document.getElementById('removeRobuxUser').value.trim();
+            const amount = parseInt(document.getElementById('removeRobuxAmount').value);
+            if (!user || isNaN(amount) || amount <= 0) return alert('Invalid input');
+            let data = JSON.parse(localStorage.getItem(user) || '{}');
+            data.robux = Math.max(0, (data.robux || 0) - amount);
+            localStorage.setItem(user, JSON.stringify(data));
+            document.getElementById('result').innerText = `Removed ${amount} Robux from ${user}!`;
+        }
+        function giveTix() {
+            const user = document.getElementById('tixUser').value.trim();
+            const amount = parseInt(document.getElementById('tixAmount').value);
+            if (!user || isNaN(amount) || amount <= 0) return alert('Invalid input');
+            let data = JSON.parse(localStorage.getItem(user) || '{}');
+            data.tix = (data.tix || 0) + amount;
+            localStorage.setItem(user, JSON.stringify(data));
+            document.getElementById('result').innerText = `Gave ${amount} Tix to ${user}!`;
+        }
+        function removeTix() {
+            const user = document.getElementById('removeTixUser').value.trim();
+            const amount = parseInt(document.getElementById('removeTixAmount').value);
+            if (!user || isNaN(amount) || amount <= 0) return alert('Invalid input');
+            let data = JSON.parse(localStorage.getItem(user) || '{}');
+            data.tix = Math.max(0, (data.tix || 0) - amount);
+            localStorage.setItem(user, JSON.stringify(data));
+            document.getElementById('result').innerText = `Removed ${amount} Tix from ${user}!`;
+        }
+        function toggleStockField() {
+            const limited = document.getElementById('itemLimited').checked;
+            document.getElementById('itemStock').style.display = limited ? 'block' : 'none';
+        }
+        function addCatalogItem() {
+            const name = document.getElementById('itemName').value.trim();
+            const image = document.getElementById('itemImage').value.trim();
+            const desc = document.getElementById('itemDesc').value.trim() || 'No description provided.';
+            const robux = parseInt(document.getElementById('itemRobux').value) || 0;
+            const tix = parseInt(document.getElementById('itemTix').value) || 0;
+            const isNew = document.getElementById('itemNew').checked;
+            const isLimited = document.getElementById('itemLimited').checked;
+            let stock = null;
+            if (isLimited) {
+                stock = parseInt(document.getElementById('itemStock').value);
+                if (isNaN(stock) || stock < 1 || stock > 1500) {
+                    return alert('Limited items must have stock between 1 and 1500!');
+                }
+            }
+            if (!name || !image) return alert('Name and Image URL are required!');
+            const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+            const isVerified = userData.verified || false;
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const id = Date.now();
+            catalog.push({
+                id,
+                name,
+                image,
+                creator: currentUser,
+                verified: isVerified,
+                description: desc,
+                robuxPrice: robux,
+                tixPrice: tix,
+                onSale: true,
+                isNew,
+                isLimited,
+                stock
+            });
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = `"${name}" uploaded to catalog!`;
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemImage').value = '';
+            document.getElementById('itemDesc').value = '';
+            document.getElementById('itemRobux').value = '';
+            document.getElementById('itemTix').value = '';
+            document.getElementById('itemNew').checked = false;
+            document.getElementById('itemLimited').checked = false;
+            document.getElementById('itemStock').value = '';
+            document.getElementById('itemStock').style.display = 'none';
+        }
+        const ITEMS_PER_PAGE = 10;
+        let currentPage = 1;
+        function loadCatalogPage(page = 1) {
+            currentPage = page;
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = '';
+            const catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            if (catalog.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;">No items in catalog yet.</p>';
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+            const totalPages = Math.ceil(catalog.length / ITEMS_PER_PAGE);
+            const start = (page - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const pageItems = catalog.slice(start, end);
+            pageItems.forEach(item => {
+                const verifiedMark = item.verified ? ' ✔️' : '';
+                let borderClass = '';
+                if (item.isNew && item.isLimited) borderClass = 'item-new item-limited';
+                else if (item.isNew) borderClass = 'item-new';
+                else if (item.isLimited) borderClass = 'item-limited';
+                const div = document.createElement('div');
+                div.className = `catalog-item ${borderClass}`;
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="catalog-item-info">
+                        <div class="catalog-item-name">${item.name}
+                            ${item.isNew ? '<span style="color:#ffcc00;"> (NEW)</span>' : ''}
+                            ${item.isLimited ? '<span style="color:#ff6600; font-weight:bold;"> (LIMITED)</span>' : ''}
+                        </div>
+                        <div class="catalog-item-details">
+                            By: ${item.creator || 'Unknown'}${verifiedMark}<br>
+                            Status: <span class="${item.onSale ? 'status-onsale' : 'status-offsale'}">${item.onSale ? 'On Sale' : 'Offsale'}</span><br>
+                            Price: R$${item.robuxPrice} ${item.tixPrice > 0 ? ` | ${item.tixPrice} Tix` : ''}<br>
+                            ${item.isLimited ? `Remaining Stock: <strong>${item.stock}</strong>` : ''}
+                        </div>
+                    </div>
+                    <div class="catalog-item-controls">
+                        <input type="number" id="priceRobux_${item.id}" placeholder="Robux" value="${item.robuxPrice}">
+                        <input type="number" id="priceTix_${item.id}" placeholder="Tix" value="${item.tixPrice}">
+                        <button class="action secondary" onclick="updateItem(${item.id})">Update Price</button>
+                        <button class="${item.onSale ? 'action remove' : 'action'}" onclick="toggleSale(${item.id})">
+                            ${item.onSale ? 'Set Offsale' : 'Set On Sale'}
+                        </button>
+                        <button class="action" onclick="toggleNew(${item.id})">${item.isNew ? 'Unmark NEW' : 'Mark NEW'}</button>
+                        <button class="action" onclick="toggleLimited(${item.id})">${item.isLimited ? 'Unmark LIMITED' : 'Mark LIMITED'}</button>
+                        ${item.isLimited ? `<input type="number" id="stock_${item.id}" placeholder="Stock" value="${item.stock || ''}">
+                        <button class="action secondary" onclick="updateStock(${item.id})">Update Stock</button>` : ''}
+                        <button class="action danger" onclick="deleteCatalogItem(${item.id})">Delete Item</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            const pagination = document.getElementById('paginationControls');
+            pagination.innerHTML = `
+                <button onclick="loadCatalogPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>← Previous</button>
+                <span>Page <input type="number" class="page-input" min="1" max="${totalPages}" value="${page}" onchange="loadCatalogPage(Math.max(1, Math.min(${totalPages}, this.value)))"> of ${totalPages}</span>
+                <button onclick="loadCatalogPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Next →</button>
+            `;
+        }
+        function updateItem(id) {
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const item = catalog.find(i => i.id === id);
+            if (!item) return;
+            item.robuxPrice = parseInt(document.getElementById(`priceRobux_${id}`).value) || 0;
+            item.tixPrice = parseInt(document.getElementById(`priceTix_${id}`).value) || 0;
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = 'Item price updated!';
+            loadCatalogPage(currentPage);
+        }
+        function toggleSale(id) {
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const item = catalog.find(i => i.id === id);
+            if (!item) return;
+            item.onSale = !item.onSale;
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = `Item now ${item.onSale ? 'On Sale' : 'Offsale'}!`;
+            loadCatalogPage(currentPage);
+        }
+        function toggleNew(id) {
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const item = catalog.find(i => i.id === id);
+            if (!item) return;
+            item.isNew = !item.isNew;
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = `Item ${item.isNew ? 'marked' : 'unmarked'} as NEW!`;
+            loadCatalogPage(currentPage);
+        }
+        function toggleLimited(id) {
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const item = catalog.find(i => i.id === id);
+            if (!item) return;
+            item.isLimited = !item.isLimited;
+            if (!item.isLimited) item.stock = null;
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = `Item ${item.isLimited ? 'marked' : 'unmarked'} as LIMITED!`;
+            loadCatalogPage(currentPage);
+        }
+        function updateStock(id) {
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const item = catalog.find(i => i.id === id);
+            if (!item || !item.isLimited) return;
+            const newStock = parseInt(document.getElementById(`stock_${id}`).value);
+            if (isNaN(newStock) || newStock < 1) return alert('Invalid stock value');
+            item.stock = newStock;
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = 'Stock updated!';
+            loadCatalogPage(currentPage);
+        }
+        function deleteCatalogItem(id) {
+            if (!confirm('Delete this item permanently?')) return;
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            catalog = catalog.filter(i => i.id !== id);
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            document.getElementById('result').innerText = 'Item deleted!';
+            loadCatalogPage(currentPage);
+        }
+        // === NEW: Grant Admin Access ===
+        function grantAdmin() {
+            const user = document.getElementById('adminUser').value.trim();
+            if (!user) return alert('Enter a username');
+            if (admins.includes(user)) {
+                document.getElementById('result').innerText = `${user} is already an admin!`;
+                return;
+            }
+            admins.push(user);
+            document.getElementById('result').innerText = `${user} has been granted admin panel access!`;
+        }
+        // === PENDING UPLOADS SYSTEM ===
+        function loadPendingUploads() {
+            const grid = document.getElementById('pendingGrid');
+            grid.innerHTML = '';
+            const pending = JSON.parse(localStorage.getItem('pendingUploads') || '[]');
+            if (pending.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;">No pending uploads.</p>';
+                return;
+            }
+            pending.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'catalog-item';
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="catalog-item-info">
+                        <div class="catalog-item-name">${item.name}</div>
+                        <div class="catalog-item-details">
+                            By: ${item.creator}<br>
+                            Status: <span class="status-pending">Pending Approval</span><br>
+                            Price: R$${item.robuxPrice} ${item.tixPrice > 0 ? ` | ${item.tixPrice} Tix` : ''}<br>
+                            ${item.isLimited ? `Stock: ${item.stock}` : ''}
+                        </div>
+                    </div>
+                    <div class="catalog-item-controls">
+                        <button class="action approve" onclick="approveItem(${item.id})">Approve</button>
+                        <button class="action danger" onclick="rejectItem(${item.id})">Reject</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+        function approveItem(id) {
+            let pending = JSON.parse(localStorage.getItem('pendingUploads') || '[]');
+            const item = pending.find(i => i.id === id);
+            if (!item) return;
+            // Set default user-upload prices
+            item.robuxPrice = 5;
+            item.tixPrice = 10;
+            item.onSale = true;
+            let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            catalog.push(item);
+            localStorage.setItem('catalog', JSON.stringify(catalog));
+            pending = pending.filter(i => i.id !== id);
+            localStorage.setItem('pendingUploads', JSON.stringify(pending));
+            document.getElementById('result').innerText = `"${item.name}" has been approved and added to catalog for 5 Robux / 10 Tix!`;
+            updatePendingCount();
+            loadPendingUploads();
+            if (document.getElementById('managecatalog').classList.contains('active')) {
+                loadCatalogPage(currentPage);
+            }
+        }
+        function rejectItem(id) {
+            if (!confirm('Reject this upload?')) return;
+            let pending = JSON.parse(localStorage.getItem('pendingUploads') || '[]');
+            pending = pending.filter(i => i.id !== id);
+            localStorage.setItem('pendingUploads', JSON.stringify(pending));
+            document.getElementById('result').innerText = 'Upload rejected and removed.';
+            updatePendingCount();
+            loadPendingUploads();
+        }
+        function updatePendingCount() {
+            const pending = JSON.parse(localStorage.getItem('pendingUploads') || '[]');
+            const badge = document.getElementById('pendingCount');
+            if (pending.length > 0) {
+                badge.innerText = pending.length;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        // Run on load
+        updatePendingCount();
+        // Ban check
+        const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '[]');
+        if (bannedUsers.includes(currentUser)) {
+            alert('Your account is permanently banned.');
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

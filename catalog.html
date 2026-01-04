@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaRevival - Catalog</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000 url('https://www.themebeta.com/thumbnail/728/1113207/files/chrome/images/201607/08/a7e9a6aa6caf76e019e27cacd48ef143.webp') fixed center/cover; color: white; font-family: Arial, sans-serif; }
+        .topbar-black { background: #1a1a1a; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-bottom: 1px solid #333; }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(to right, #9b59b6, #ff99ff, #e0b0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.6);
+        }
+        .nav-links a { color: white; text-decoration: none; margin: 0 15px; font-size: 18px; }
+        .nav-links a:hover { text-decoration: underline; }
+        .search-bar { background: #333; border: none; padding: 10px; border-radius: 20px; width: 300px; color: white; }
+        .top-right-icons { display: flex; align-items: center; gap: 20px; font-size: 24px; }
+        .currency { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 18px; }
+        .currency img { width: 28px; height: 28px; }
+        .robux-amount { color: #00FF00; }
+        .tix-amount { color: #FFD700; }
+        .notification-bell img { width: 28px; height: 28px; vertical-align: middle; }
+        .notification-bell { position: relative; cursor: pointer; }
+        .settings-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px 0;
+            min-width: 140px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 200;
+        }
+        .settings-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .settings-dropdown button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .orange-banner { background: #FFA500; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 18px; position: fixed; top: 60px; left: 220px; right: 0; z-index: 99; }
+        .sidebar { position: fixed; left: 0; top: 60px; bottom: 0; width: 220px; background: #1a1a1a; padding: 20px 0; overflow-y: auto; }
+        .sidebar a { display: block; padding: 15px 20px; color: #ccc; text-decoration: none; font-size: 18px; }
+        .sidebar a:hover { background: rgba(255,165,0,0.2); }
+        .sidebar .admin-link { display: none; color: #FF0000; font-weight: bold; }
+        .sidebar .upgrade { background: #000; color: white; margin: 20px; padding: 15px; text-align: center; border: 2px solid white; font-weight: bold; font-size: 18px; }
+        /* Username divider in sidebar - thinner and centered */
+        .username-divider {
+            padding: 6px 8px 18px 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+        .username-divider img {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+        }
+        /* Main content scrollable area */
+        .main {
+            margin-left: 220px;
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .catalog-header { font-size: 36px; font-weight: bold; color: #fff; margin-bottom: 15px; padding-left: 5px; }
+        .catalog-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .catalog-sidebar {
+            width: 200px;
+            background: #222;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .catalog-sidebar h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #ccc;
+        }
+        .catalog-sidebar a {
+            display: block;
+            color: #66ccff;
+            text-decoration: none;
+            padding: 4px 0;
+        }
+        .catalog-sidebar a:hover { text-decoration: underline; }
+        .top-filters {
+            flex-grow: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+            background: #222;
+            padding: 10px 15px;
+            border-radius: 6px;
+        }
+        .top-filters select {
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .items-section h2 {
+            font-size: 26px;
+            margin: 30px 0 15px 0;
+            color: #fff;
+        }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .item {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .item:hover {
+            transform: translateY(-10px);
+        }
+        .item-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .item-box {
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .item-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            display: block;
+        }
+        .new-ribbon {
+            position: absolute;
+            top: 4px;
+            right: -8px;
+            background: #ff0000;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 4px;
+            transform: rotate(20deg);
+            z-index: 2;
+        }
+        /* LIMITEDU banner - small, bottom-left */
+        .limitedu-ribbon {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 6px;
+            z-index: 3;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .limitedu-ribbon span:first-child {
+            color: #00ff00;
+            text-shadow: 0 0 8px #00ff00;
+        }
+        .limitedu-ribbon span:last-child {
+            color: #ffff00;
+            text-shadow: 0 0 8px #ffff00;
+        }
+        /* Dropdown info box - clean, smaller, readable */
+        .item-info-box {
+            background: #111;
+            border: 1px solid #444;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            padding: 8px 10px;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .item:hover .item-info-box {
+            opacity: 1;
+            visibility: visible;
+        }
+        .info-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .info-creator {
+            color: #aaa;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .info-creator img {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+        .info-updated {
+            color: #aaa;
+            margin-bottom: 2px;
+        }
+        .info-sales {
+            color: #aaa;
+            margin-bottom: 2px;
+        }
+        .info-favorited {
+            color: #aaa;
+        }
+        .info-remaining {
+            color: #ff5500;
+            font-weight: bold;
+            margin: 4px 0 2px 0;
+        }
+        /* NEW: Full Item Details Page (replaces modal) */
+        #itemDetailsPage {
+            display: none;
+            margin-left: 220px;
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .details-container {
+            display: flex;
+            gap: 50px;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: flex-start;
+        }
+        .details-image {
+            flex: 0 0 300px;
+        }
+        .details-image img {
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            background: #222;
+            border-radius: 12px;
+        }
+        .details-info {
+            flex: 1;
+            position: relative;
+        }
+        .details-title {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .details-creator {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .details-created {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .details-updated {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        .details-description {
+            font-size: 18px;
+            margin: 20px 0 30px 0;
+            line-height: 1.6;
+        }
+        /* Price box - moved closer to creator info */
+        .details-price-box {
+            position: absolute;
+            top: 0;
+            right: 20px; /* moved closer */
+            background: #222;
+            padding: 10px 16px;
+            border-radius: 12px;
+            text-align: center;
+            width: 200px;
+        }
+        .details-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 4px;
+        }
+        .details-price-tix {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 4px;
+        }
+        .details-buy-button {
+            background: #00cc00;
+            color: white;
+            border: none;
+            padding: 8px 16px; /* smaller padding */
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 4px; /* more rectangular */
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+        .details-buy-button:hover {
+            background: #00ff00;
+        }
+        .details-buy-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .details-buy-tix-button {
+            background: #ccaa00;
+            color: white;
+            border: none;
+            padding: 8px 16px; /* smaller padding */
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 4px; /* more rectangular */
+            cursor: pointer;
+            width: 100%;
+        }
+        .details-buy-tix-button:hover {
+            background: #ffdd00;
+        }
+        .details-buy-tix-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .details-sold {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 6px;
+        }
+        .details-favorite {
+            color: #FFD700;
+            font-size: 18px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .report-abuse {
+            color: #ff6666;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .details-genres {
+            font-size: 18px;
+            color: #aaa;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+        .or-separator {
+            margin: 6px 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+        /* Owned text moved down */
+        .owned-text {
+            margin-top: 40px;
+            font-size: 24px;
+            color: #00ccff;
+            font-weight: bold;
+            text-align: center;
+        }
+        /* Custom scrollbar styling */
+        .main::-webkit-scrollbar {
+            width: 12px;
+        }
+        .main::-webkit-scrollbar-track {
+            background: #111;
+        }
+        .main::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 6px;
+        }
+        .main::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar-black">
+        <div class="nav-links">
+            <span class="site-name">NovaRevival</span>
+            <a href="#">Games</a>
+            <a href="catalog.html">Catalog</a>
+            <a href="Create.html">Create</a>
+            <a href="#">Download</a>
+        </div>
+        <input type="text" class="search-bar" placeholder="Search">
+        <div class="top-right-icons">
+            <div class="currency">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Robux_2019_Logo_gold.svg/800px-Robux_2019_Logo_gold.svg.png" alt="Robux">
+                <span id="robuxAmount" class="robux-amount">0</span>
+            </div>
+            <div class="currency">
+                <img src="https://tr.rbxcdn.com/e0d943e9fdaa48c32c5f29d69e66166c/420/420/Image/Png" alt="Tix">
+                <span id="tixAmount" class="tix-amount">0</span>
+            </div>
+            <div class="notification-bell" id="settingsIcon">
+                <img src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png" alt="Settings">
+            </div>
+        </div>
+    </div>
+    <!-- Settings Dropdown -->
+    <div class="settings-dropdown" id="settingsDropdown">
+        <button onclick="signOut()">Sign out</button>
+        <button onclick="goToSettings()">Settings</button>
+    </div>
+    <div class="orange-banner">
+        Hey, hey you! Copy the link to join the discord server: https://discord.gg/mrnwrdXgSa
+    </div>
+    <div class="sidebar">
+        <div class="username-divider" id="sidebarUsername">Guest</div>
+        <a href="home.html">Home</a>
+        <a href="#">Profile</a>
+        <a href="#">Messages</a>
+        <a href="#">Friends</a>
+        <a href="avatar.html">Avatar</a>
+        <a href="#">Inventory</a>
+        <a href="#">Trade</a>
+        <a href="#">Groups</a>
+        <a href="#">Forums</a>
+        <a href="#">Redeem</a>
+        <a href="admin.html" class="admin-link">ADMIN</a>
+        <div class="upgrade">Upgrade Now</div>
+    </div>
+    <div class="main">
+        <h1 class="catalog-header">Catalog</h1>
+        <div class="catalog-top">
+            <div class="catalog-sidebar">
+                <h3>Browse by Category</h3>
+                <a href="#">Featured</a>
+                <a href="#">Collectibles</a>
+                <a href="#">All Categories</a>
+                <a href="#">Clothing</a>
+                <a href="#">Body Parts</a>
+                <a href="#">Gear</a>
+                <a href="#">Animations</a>
+            </div>
+            <div class="top-filters">
+                <div>
+                    <strong>Sort By:</strong>
+                    <select>
+                        <option>Relevance</option>
+                        <option>Most Popular</option>
+                        <option>Price (Low to High)</option>
+                        <option>Price (High to Low)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="items-section">
+            <h2>Featured Items on NovaRevival</h2>
+            <div class="items-grid" id="catalogGrid">
+                <!-- Items loaded dynamically -->
+            </div>
+        </div>
+    </div>
+    <!-- NEW: Full Item Details Page (replaces modal) -->
+    <div id="itemDetailsPage">
+        <div class="details-container">
+            <div class="details-image">
+                <img id="detailsImage" src="" alt="">
+            </div>
+            <div class="details-info">
+                <h1 class="details-title" id="detailsTitle"></h1>
+                <div class="details-creator" id="detailsCreator"></div>
+                <div class="details-created" id="detailsCreated"></div>
+                <div class="details-updated" id="detailsUpdated"></div>
+                <!-- Price box now positioned top-right next to creator info -->
+                <div class="details-price-box" id="detailsPriceBox">
+                    <!-- Filled dynamically -->
+                </div>
+                <div class="details-sold" id="detailsSold">(0 Sold)</div>
+                <div class="details-favorite" id="detailsFavorite">★ 0 Favorites</div>
+                <div class="details-description" id="detailsDescription">No description provided.</div>
+                <div class="report-abuse">Report Abuse</div>
+                <div class="details-genres">Genres: <span id="detailsGenres">All</span></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('settingsIcon').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('settingsDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('settingsDropdown').style.display = 'none';
+        });
+        function signOut() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+        function goToSettings() {
+            alert('Settings page coming soon!');
+        }
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            alert('Not logged in! Redirecting to login...');
+            window.location.href = 'login.html';
+        } else {
+            const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+            const isVerified = userData.verified || false;
+            let usernameHTML = currentUser;
+            if (isVerified) {
+                usernameHTML += ' <img src="https://tr.rbxcdn.com/1495c39aa26ad471b7876caefde4f73c/420/420/Image/Png" alt="Verified">';
+            }
+            document.getElementById('sidebarUsername').innerHTML = usernameHTML;
+            const robux = userData.robux || 0;
+            const tix = userData.tix || 0;
+            function abbreviateNumber(num) {
+                if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+                return num.toString();
+            }
+            document.getElementById('robuxAmount').innerText = abbreviateNumber(robux);
+            document.getElementById('tixAmount').innerText = abbreviateNumber(tix);
+        }
+        const admins = ['TestUser', 'tinypuurs', 'NovaRevival', 'nova.revival', 'fuckyou'];
+        if (admins.includes(currentUser)) {
+            document.querySelector('.admin-link').style.display = 'block';
+        }
+        let currentItem = null;
+        function timeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " years ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes ago";
+            return Math.floor(seconds) + " seconds ago";
+        }
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+        }
+        function loadCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = '';
+            const catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+            const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+            const ownedItems = userData.inventory || [];
+            if (catalog.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #aaa; font-size: 20px;">No items in catalog yet.</p>';
+                return;
+            }
+            catalog.sort((a, b) => b.id - a.id);
+            let salesData = JSON.parse(localStorage.getItem('itemSales') || '{}');
+            catalog.forEach(item => {
+                if (!item.onSale) return;
+                const sold = salesData[item.id] || 0;
+                const remaining = item.stock !== undefined && item.stock !== null ? item.stock - sold : null;
+                if (remaining !== null && remaining <= 0) return;
+                const isOwned = ownedItems.includes(item.id);
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.onclick = () => showItemDetails(item);
+                let priceText = '';
+                if (item.robuxPrice > 0) priceText += `R$${item.robuxPrice}`;
+                if (item.tixPrice > 0) priceText += priceText ? ` | ${item.tixPrice} Tix` : `${item.tixPrice} Tix`;
+                if (priceText === '') priceText = 'Free';
+                const salesCount = sold;
+                const updatedAgo = timeAgo(item.id);
+                let remainingHTML = '';
+                if (item.isLimited && remaining !== null) {
+                    remainingHTML = `<div class="info-remaining">Remaining: ${remaining}</div>`;
+                }
+                let verifiedBadge = '';
+                if (item.verified) {
+                    verifiedBadge = '<img src="https://tr.rbxcdn.com/1495c39aa26ad471b7876caefde4f73c/420/420/Image/Png" alt="Verified" style="width:16px;height:16px;">';
+                }
+                let infoHTML = `
+                    <div class="item-info-box">
+                        <div class="info-name">${item.name}</div>
+                        <div>${priceText}</div>
+                        ${remainingHTML}
+                        <div class="info-creator">Creator: ${item.creator || 'Unknown'}${verifiedBadge}</div>
+                        <div class="info-updated">Updated: ${updatedAgo}</div>
+                        <div class="info-sales">Sales: ${salesCount}</div>
+                        <div class="info-favorited">Favorited: 0 times</div>
+                    </div>
+                `;
+                let priceHTML = '';
+                let limitedHTML = '';
+                if (item.isLimited) {
+                    limitedHTML = '<div class="limitedu-ribbon"><span>LIMITED</span><span>U</span></div>';
+                }
+                div.innerHTML = `
+                    ${item.isNew || item.isLimited ? '<div class="new-ribbon">NEW</div>' : ''}
+                    <div class="item-wrapper">
+                        <div class="item-box">
+                            <img src="${item.image}" alt="${item.name}" class="item-image">
+                            ${limitedHTML}
+                        </div>
+                        ${infoHTML}
+                    </div>
+                    ${priceHTML}
+                `;
+                grid.appendChild(div);
+            });
+        }
+        function showItemDetails(item) {
+            currentItem = item;
+            document.querySelector('.main').style.display = 'none';
+            document.getElementById('itemDetailsPage').style.display = 'block';
+            document.getElementById('detailsTitle').innerText = item.name;
+            document.getElementById('detailsImage').src = item.image;
+            let creatorHTML = `Creator: ${item.creator || 'Unknown'}`;
+            if (item.verified) {
+                creatorHTML += ` <img src="https://tr.rbxcdn.com/1495c39aa26ad471b7876caefde4f73c/420/420/Image/Png" style="width:24px;height:24px;vertical-align:middle;">`;
+            }
+            document.getElementById('detailsCreator').innerHTML = creatorHTML;
+            document.getElementById('detailsCreated').innerText = `Created: ${formatDate(item.id)}`;
+            document.getElementById('detailsUpdated').innerText = `Updated: ${timeAgo(item.id)}`;
+            document.getElementById('detailsDescription').innerText = item.description || 'No description provided.';
+            const salesData = JSON.parse(localStorage.getItem('itemSales') || '{}');
+            const sold = salesData[item.id] || 0;
+            document.getElementById('detailsSold').innerText = `(${sold} Sold)`;
+            document.getElementById('detailsFavorite').innerHTML = '★ 0 Favorites';
+            const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+            const ownedItems = userData.inventory || [];
+            const ownedCount = ownedItems.filter(id => id === item.id).length;
+            const priceBox = document.getElementById('detailsPriceBox');
+            priceBox.innerHTML = '';
+            if (item.isLimited) {
+                const remaining = item.stock - sold;
+                let maxBuy = remaining <= 50 ? 3 : 10;
+                if (ownedCount >= maxBuy) {
+                    priceBox.innerHTML = '<div class="owned-text">Owned</div>';
+                } else {
+                    let hasRobux = item.robuxPrice > 0;
+                    let hasTix = item.tixPrice > 0;
+                    if (hasRobux) {
+                        priceBox.innerHTML += `<div class="details-price">Price: R$${item.robuxPrice}</div>`;
+                        priceBox.innerHTML += `<button class="details-buy-button" onclick="buyItem('robux')">Buy with R$</button>`;
+                    }
+                    if (hasTix) {
+                        if (hasRobux) priceBox.innerHTML += '<div class="or-separator">OR</div>';
+                        priceBox.innerHTML += `<div class="details-price-tix">Price: ${item.tixPrice} Tix</div>`;
+                        priceBox.innerHTML += `<button class="details-buy-tix-button" onclick="buyItem('tix')">Buy with Tix</button>`;
+                    }
+                    if (!hasRobux && !hasTix) {
+                        priceBox.innerHTML += `<div class="details-price">Free</div>`;
+                        priceBox.innerHTML += `<button class="details-buy-button" onclick="buyItem('free')">Take for Free</button>`;
+                    }
+                }
+            } else {
+                if (ownedCount > 0) {
+                    priceBox.innerHTML = '<div class="owned-text">Owned</div>';
+                } else {
+                    let hasRobux = item.robuxPrice > 0;
+                    let hasTix = item.tixPrice > 0;
+                    if (hasRobux) {
+                        priceBox.innerHTML += `<div class="details-price">Price: R$${item.robuxPrice}</div>`;
+                        priceBox.innerHTML += `<button class="details-buy-button" onclick="buyItem('robux')">Buy with R$</button>`;
+                    }
+                    if (hasTix) {
+                        if (hasRobux) priceBox.innerHTML += '<div class="or-separator">OR</div>';
+                        priceBox.innerHTML += `<div class="details-price-tix">Price: ${item.tixPrice} Tix</div>`;
+                        priceBox.innerHTML += `<button class="details-buy-tix-button" onclick="buyItem('tix')">Buy with Tix</button>`;
+                    }
+                    if (!hasRobux && !hasTix) {
+                        priceBox.innerHTML += `<div class="details-price">Free</div>`;
+                        priceBox.innerHTML += `<button class="details-buy-button" onclick="buyItem('free')">Take for Free</button>`;
+                    }
+                }
+            }
+        }
+        function backToCatalog() {
+            document.querySelector('.main').style.display = 'block';
+            document.getElementById('itemDetailsPage').style.display = 'none';
+            currentItem = null;
+        }
+        function buyItem(currency = 'robux') {
+            if (!currentItem) return;
+            if (currentItem.isLimited) {
+                let salesData = JSON.parse(localStorage.getItem('itemSales') || '{}');
+                const sold = salesData[currentItem.id] || 0;
+                const remaining = currentItem.stock - sold;
+                if (remaining <= 0) {
+                    alert('This limited item is sold out!');
+                    return;
+                }
+                const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+                const ownedCount = (userData.inventory || []).filter(id => id === currentItem.id).length;
+                let maxBuy = remaining <= 50 ? 3 : 10;
+                if (ownedCount >= maxBuy) {
+                    alert(`You can only own up to ${maxBuy} copies of this limited item!`);
+                    return;
+                }
+            }
+            const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+            let paid = false;
+            let robuxPaid = 0;
+            let tixPaid = 0;
+            if (currency === 'robux' && currentItem.robuxPrice > 0 && userData.robux >= currentItem.robuxPrice) {
+                userData.robux -= currentItem.robuxPrice;
+                robuxPaid = currentItem.robuxPrice;
+                paid = true;
+            } else if (currency === 'tix' && currentItem.tixPrice > 0 && userData.tix >= currentItem.tixPrice) {
+                userData.tix -= currentItem.tixPrice;
+                tixPaid = currentItem.tixPrice;
+                paid = true;
+            } else if (currency === 'free') {
+                paid = true;
+            }
+            if (!paid) {
+                alert('Not enough currency!');
+                return;
+            }
+            if (!userData.inventory) userData.inventory = [];
+            userData.inventory.push(currentItem.id);
+            localStorage.setItem(currentUser, JSON.stringify(userData));
+            if (robuxPaid > 0 && currentItem.creator && currentItem.creator !== currentUser) {
+                let creatorData = JSON.parse(localStorage.getItem(currentItem.creator) || '{}');
+                creatorData.robux = (creatorData.robux || 0) + robuxPaid;
+                localStorage.setItem(currentItem.creator, JSON.stringify(creatorData));
+            }
+            if (tixPaid > 0 && currentItem.creator && currentItem.creator !== currentUser) {
+                let creatorData = JSON.parse(localStorage.getItem(currentItem.creator) || '{}');
+                creatorData.tix = (creatorData.tix || 0) + tixPaid;
+                localStorage.setItem(currentItem.creator, JSON.stringify(creatorData));
+            }
+            let salesData = JSON.parse(localStorage.getItem('itemSales') || '{}');
+            salesData[currentItem.id] = (salesData[currentItem.id] || 0) + 1;
+            localStorage.setItem('itemSales', JSON.stringify(salesData));
+            if (currentItem.isLimited) {
+                const sold = salesData[currentItem.id];
+                if (sold >= currentItem.stock) {
+                    let catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
+                    const catItem = catalog.find(i => i.id === currentItem.id);
+                    if (catItem) {
+                        catItem.onSale = false;
+                        localStorage.setItem('catalog', JSON.stringify(catalog));
+                    }
+                }
+            }
+            alert(`You bought ${currentItem.name}!`);
+            document.getElementById('robuxAmount').innerText = abbreviateNumber(userData.robux);
+            document.getElementById('tixAmount').innerText = abbreviateNumber(userData.tix);
+            showItemDetails(currentItem);
+            loadCatalog();
+        }
+        window.addEventListener('load', loadCatalog);
+        window.addEventListener('storage', loadCatalog);
+    </script>
+</body>
+</html>
