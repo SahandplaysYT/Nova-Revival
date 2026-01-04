@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaRevival - Inventory</title>
+
+<style>
+body { margin:0; padding:0; background:#000 url('https://www.themebeta.com/thumbnail/728/1113207/files/chrome/images/201607/08/a7e9a6aa6caf76e019e27cacd48ef143.webp') fixed center/cover; color:white; font-family:Arial,sans-serif; min-height:100vh; }
+
+/* TOPBAR */
+.topbar-black{background:#1a1a1a;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:100;border-bottom:1px solid #333;}
+.nav-links{display:flex;align-items:center;gap:30px;}
+.site-name{font-size:24px;font-weight:bold;background:linear-gradient(to right,#9b59b6,#ff99ff,#e0b0ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 10px rgba(155,89,182,.6);}
+.nav-links a{color:white;text-decoration:none;font-size:18px;}
+.search-bar{background:#333;border:none;padding:10px;border-radius:20px;width:300px;color:white;}
+.top-right-icons{display:flex;align-items:center;gap:20px;}
+.currency{display:flex;align-items:center;gap:8px;font-weight:bold;font-size:18px;}
+.currency img{width:28px;height:28px;}
+.robux-amount{color:#00ff00;}
+.tix-amount{color:#ffd700;}
+.notification-bell img{width:28px;height:28px;cursor:pointer;}
+
+.settings-dropdown{position:absolute;top:60px;right:20px;background:#1a1a1a;border:1px solid #333;border-radius:8px;display:none;z-index:200;min-width:140px;}
+.settings-dropdown button{width:100%;padding:12px 20px;background:none;border:none;color:white;text-align:left;cursor:pointer;}
+.settings-dropdown button:hover{background:rgba(255,255,255,.1);}
+
+.orange-banner{background:#ffa500;height:40px;display:flex;align-items:center;justify-content:center;position:fixed;top:60px;left:220px;right:0;z-index:99;}
+.sidebar{position:fixed;left:0;top:60px;bottom:0;width:220px;background:#1a1a1a;padding:20px 0;overflow-y:auto;}
+.sidebar a{display:block;padding:15px 20px;color:#ccc;text-decoration:none;font-size:18px;}
+.sidebar a:hover{background:rgba(255,165,0,.2);}
+.admin-link{display:none;color:red;font-weight:bold;}
+.upgrade{background:#000;margin:20px;padding:15px;text-align:center;border:2px solid white;font-weight:bold;}
+
+.username-divider{
+    padding:6px 8px 18px;
+    text-align:center;
+    font-size:16px;
+    font-weight:bold;
+    border-bottom:1px solid #333;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+}
+.username-divider img{width:18px;height:18px;}
+
+.main{margin-left:240px;margin-top:110px;padding:20px;}
+.inventory-title{font-size:36px;margin-bottom:20px;}
+
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:20px;}
+.inventory-item{background:#222;border-radius:8px;padding:10px;text-align:center;position:relative;}
+.inventory-item img{width:100%;height:120px;object-fit:contain;background:#333;border-radius:6px;}
+.item-name{margin-top:8px;font-size:14px;}
+.item-creator{font-size:12px;color:#aaa;display:flex;justify-content:center;gap:4px;align-items:center;}
+.item-creator img{width:14px;height:14px;}
+.limited-tag{position:absolute;top:8px;left:8px;background:yellow;color:black;font-size:12px;padding:2px 6px;border-radius:4px;font-weight:bold;}
+</style>
+</head>
+
+<body>
+
+<div class="topbar-black">
+    <div class="nav-links">
+        <span class="site-name">NovaRevival</span>
+        <a href="#">Games</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="Create.html">Create</a>
+        <a href="#">Download</a>
+    </div>
+    <input class="search-bar" placeholder="Search">
+    <div class="top-right-icons">
+        <div class="currency">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Robux_2019_Logo_gold.svg/800px-Robux_2019_Logo_gold.svg.png">
+            <span id="robuxAmount" class="robux-amount">0</span>
+        </div>
+        <div class="currency">
+            <img src="https://tr.rbxcdn.com/e0d943e9fdaa48c32c5f29d69e66166c/420/420/Image/Png">
+            <span id="tixAmount" class="tix-amount">0</span>
+        </div>
+        <div class="notification-bell" id="settingsIcon">
+            <img src="https://www.iconpacks.net/icons/2/free-settings-icon-3110-thumb.png">
+        </div>
+    </div>
+</div>
+
+<div class="settings-dropdown" id="settingsDropdown">
+    <button onclick="signOut()">Sign out</button>
+    <button onclick="goToSettings()">Settings</button>
+</div>
+
+<div class="orange-banner">
+    Hey, hey you! Copy the link to join the discord server: https://discord.gg/mrnwrdXgSa
+</div>
+
+<div class="sidebar">
+    <div class="username-divider" id="sidebarUsername">Guest</div>
+    <a href="home.html">Home</a>
+    <a href="avatar.html">Avatar</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="admin.html" class="admin-link">ADMIN</a>
+    <div class="upgrade">Upgrade Now</div>
+</div>
+
+<div class="main">
+    <h1 class="inventory-title" id="inventoryTitle">Inventory</h1>
+    <div class="items-grid" id="inventoryGrid"></div>
+</div>
+
+<script>
+const VERIFIED_IMG = 'https://tr.rbxcdn.com/1495c39aa26ad471b7876caefde4f73c/420/420/Image/Png';
+
+const currentUser = localStorage.getItem('currentUser');
+if(!currentUser) location.href='login.html';
+
+const userData = JSON.parse(localStorage.getItem(currentUser)||'{}');
+const isVerified = userData.verified === true;
+
+document.getElementById('sidebarUsername').innerHTML =
+    currentUser + (isVerified ? ` <img src="${VERIFIED_IMG}">` : '');
+
+document.getElementById('inventoryTitle').innerText = `${currentUser}'s Inventory`;
+
+function abbreviate(n){
+    if(n>=1e9) return (n/1e9).toFixed(1)+'B';
+    if(n>=1e6) return (n/1e6).toFixed(1)+'M';
+    if(n>=1e3) return (n/1e3).toFixed(1)+'K';
+    return n;
+}
+document.getElementById('robuxAmount').innerText = abbreviate(userData.robux||0);
+document.getElementById('tixAmount').innerText = abbreviate(userData.tix||0);
+
+function loadInventory(){
+    const grid = document.getElementById('inventoryGrid');
+    grid.innerHTML = '';
+    const catalog = JSON.parse(localStorage.getItem('catalog')||'[]');
+    const inventory = userData.inventory||[];
+
+    if(!inventory.length){
+        grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#aaa;font-size:20px;">No items owned.</p>';
+        return;
+    }
+
+    inventory.forEach(id=>{
+        const item = catalog.find(i=>i.id===id);
+        if(!item) return;
+
+        const creatorData = JSON.parse(localStorage.getItem(item.creator) || '{}');
+        const creatorVerified = creatorData.verified === true;
+
+        grid.innerHTML += `
+        <div class="inventory-item">
+            ${item.isLimited?'<div class="limited-tag">LIMITED U</div>':''}
+            <img src="${item.image}">
+            <div class="item-name">${item.name}</div>
+            <div class="item-creator">
+                By ${item.creator || 'Unknown'}
+                ${creatorVerified ? `<img src="${VERIFIED_IMG}">` : ''}
+            </div>
+        </div>`;
+    });
+}
+
+document.getElementById('settingsIcon').onclick=e=>{
+    e.stopPropagation();
+    settingsDropdown.style.display=settingsDropdown.style.display==='block'?'none':'block';
+};
+document.addEventListener('click',()=>settingsDropdown.style.display='none');
+
+function signOut(){localStorage.removeItem('currentUser');location.href='login.html';}
+function goToSettings(){alert('Settings coming soon');}
+
+loadInventory();
+</script>
+
+</body>
+</html>

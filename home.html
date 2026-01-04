@@ -147,7 +147,7 @@
         <a href="#">Messages</a>
         <a href="#">Friends</a>
         <a href="avatar.html">Avatar</a>
-        <a href="#">Inventory</a>
+        <a href="inventory.html">Inventory</a>
         <a href="#">Trade</a>
         <a href="#">Groups</a>
         <a href="#">Forums</a>
@@ -221,7 +221,7 @@
             function abbreviateNumber(num) {
                 if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
                 if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-                if (num >= 1000) return (num / 1000000).toFixed(1) + 'K';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
                 return num.toString();
             }
             document.getElementById('robuxAmount').innerText = abbreviateNumber(robux);
@@ -231,6 +231,11 @@
         if (admins.includes(currentUser)) {
             document.querySelector('.admin-link').style.display = 'block';
         }
+
+        // Mobile touch support for sidebar links
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('touchstart', function() {}, { passive: true });
+        });
     </script>
 </body>
 </html>

@@ -7,6 +7,8 @@
     <style>
         body { margin: 0; padding: 0; background: #000 url('https://www.themebeta.com/thumbnail/728/1113207/files/chrome/images/201607/08/a7e9a6aa6caf76e019e27cacd48ef143.webp') fixed center/cover; color: white; font-family: Arial, sans-serif; }
         .topbar-black { background: #1a1a1a; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-bottom: 1px solid #333; }
+        .nav-links { display: flex; align-items: center; gap: 30px; }
+        .site-name { font-size: 24px; font-weight: bold; background: linear-gradient(to right, #9b59b6, #ff99ff, #e0b0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 10px rgba(155, 89, 182, 0.6); }
         .nav-links a { color: white; text-decoration: none; margin: 0 15px; font-size: 18px; }
         .nav-links a:hover { text-decoration: underline; }
         .search-bar { background: #333; border: none; padding: 10px; border-radius: 20px; width: 300px; color: white; }
@@ -50,7 +52,8 @@
         .sidebar a:hover { background: rgba(255,165,0,0.2); }
         .sidebar .admin-link { display: none; color: #FF0000; font-weight: bold; }
         .sidebar .upgrade { background: #000; color: white; margin: 20px; padding: 15px; text-align: center; border: 2px solid white; font-weight: bold; font-size: 18px; }
-
+        .username-divider { padding: 6px 8px 18px 8px; text-align: center; font-size: 16px; font-weight: bold; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 7px; }
+        .username-divider img { width: 18px; height: 18px; vertical-align: middle; }
         /* Avatar Editor Main Layout */
         .main {
             margin-left: 220px;
@@ -103,7 +106,6 @@
             font-size: 14px;
             cursor: pointer;
         }
-
         .tabs {
             display: flex;
             background: #222;
@@ -123,7 +125,6 @@
         .tab:hover {
             background: #444;
         }
-
         .items-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -156,7 +157,6 @@
             font-size: 14px;
             word-break: break-word;
         }
-
         .scaling {
             background: rgba(255,255,255,0.1);
             border-radius: 12px;
@@ -190,7 +190,6 @@
             border-radius: 50%;
             cursor: pointer;
         }
-
         .get-more {
             background: #00cc00;
             color: white;
@@ -203,20 +202,56 @@
         .get-more:hover {
             background: #00ff00;
         }
+        /* Mobile responsiveness */
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -220px;
+                transition: left 0.3s ease;
+                z-index: 150;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .main {
+                margin-left: 0;
+                flex-direction: column;
+            }
+            .scaling {
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            .orange-banner {
+                left: 0;
+            }
+            .mobile-menu-toggle {
+                display: block;
+                font-size: 28px;
+                cursor: pointer;
+                padding: 0 10px;
+            }
+        }
+        @media (min-width: 901px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Top Bar & Sidebar (same as catalog) -->
+    <!-- Top Bar with Gradient Logo -->
     <div class="topbar-black">
         <div class="nav-links">
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</div>
+            <span class="site-name">NovaRevival</span>
             <a href="#">Games</a>
             <a href="catalog.html">Catalog</a>
-            <a href="#">Create</a>
+            <a href="Create.html">Create</a>
             <a href="#">Download</a>
         </div>
         <input type="text" class="search-bar" placeholder="Search">
         <div class="top-right-icons">
-            <span id="usernameDisplay">Guest</span>
             <div class="currency">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Robux_2019_Logo_gold.svg/800px-Robux_2019_Logo_gold.svg.png" alt="Robux">
                 <span id="robuxAmount" class="robux-amount">0</span>
@@ -230,20 +265,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Settings Dropdown -->
     <div class="settings-dropdown" id="settingsDropdown">
         <button onclick="signOut()">Sign out</button>
         <button onclick="goToSettings()">Settings</button>
     </div>
+
+    <!-- Orange Banner -->
     <div class="orange-banner">
         Hey, hey you! Copy the link to join the discord server: https://discord.gg/mrnwrdXgSa
     </div>
+
+    <!-- Sidebar with Username + Verified Badge -->
     <div class="sidebar">
+        <div class="username-divider" id="sidebarUsername">Guest</div>
         <a href="home.html">Home</a>
         <a href="#">Profile</a>
         <a href="#">Messages</a>
         <a href="#">Friends</a>
         <a href="avatar.html">Avatar</a>
-        <a href="#">Inventory</a>
+        <a href="inventory.html">Inventory</a>
         <a href="#">Trade</a>
         <a href="#">Groups</a>
         <a href="#">Forums</a>
@@ -252,7 +294,7 @@
         <div class="upgrade">Upgrade Now</div>
     </div>
 
-    <!-- Avatar Editor Content -->
+    <!-- Avatar Editor Content (unchanged) -->
     <div class="main">
         <div class="avatar-preview">
             <h1>Avatar Editor</h1>
@@ -263,7 +305,6 @@
             </div>
             <div class="view-3d">3D</div>
         </div>
-
         <div class="scaling">
             <h2>Scaling</h2>
             <div class="slider-container">
@@ -300,20 +341,51 @@
             <div class="tab">Outfits</div>
         </div>
         <div class="items-grid" id="ownedItemsGrid">
-            <!-- Owned items loaded here -->
             <p style="grid-column: 1 / -1; text-align: center; color: #aaa;">Loading your items...</p>
         </div>
     </div>
 
     <script>
-        // Login check (same as other pages)
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
+
+        // Sign out / Settings
+        function signOut() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+        function goToSettings() {
+            alert('Settings page coming soon!');
+        }
+
+        // Dropdown toggle
+        document.getElementById('settingsIcon').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('settingsDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('settingsDropdown').style.display = 'none';
+        });
+
+        // Login & data load
         const currentUser = localStorage.getItem('currentUser');
         if (!currentUser) {
             alert('Not logged in! Redirecting to login...');
             window.location.href = 'login.html';
         } else {
-            document.getElementById('usernameDisplay').innerText = currentUser;
             const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
+
+            // Username in sidebar with verified badge
+            let usernameHTML = currentUser;
+            if (userData.verified) {
+                usernameHTML += ' <img src="https://tr.rbxcdn.com/1495c39aa26ad471b7876caefde4f73c/420/420/Image/Png" alt="Verified" style="width:18px;height:18px;vertical-align:middle;">';
+            }
+            document.getElementById('sidebarUsername').innerHTML = usernameHTML;
+
+            // Currency
             const robux = userData.robux || 0;
             const tix = userData.tix || 0;
             function abbreviateNumber(num) {
@@ -325,28 +397,25 @@
             document.getElementById('robuxAmount').innerText = abbreviateNumber(robux);
             document.getElementById('tixAmount').innerText = abbreviateNumber(tix);
 
+            // Admin button
             const admins = ['TestUser', 'tinypuurs', 'NovaRevival', 'fuckyou', 'nova.revival'];
             if (admins.includes(currentUser)) {
                 document.querySelector('.admin-link').style.display = 'block';
             }
         }
 
-        // Load owned items
+        // Load owned items (your existing code)
         function loadOwnedItems() {
             const grid = document.getElementById('ownedItemsGrid');
             grid.innerHTML = '';
-
             const catalog = JSON.parse(localStorage.getItem('catalog') || '[]');
             const userData = JSON.parse(localStorage.getItem(currentUser) || '{}');
             const ownedIds = userData.inventory || [];
-
             if (ownedIds.length === 0) {
                 grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #aaa;">You don\'t own any items yet. Visit the catalog!</p>';
                 return;
             }
-
             const ownedItems = catalog.filter(item => ownedIds.includes(item.id));
-
             ownedItems.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'avatar-item';
@@ -358,19 +427,14 @@
                 grid.appendChild(div);
             });
         }
-
         function equipItem(item) {
-            // Simple preview: show the item image in the avatar canvas
             const previewImg = document.getElementById('avatarPreview');
             previewImg.src = item.image;
             previewImg.style.display = 'block';
             document.getElementById('placeholderText').style.display = 'none';
-
-            // Highlight equipped item
             document.querySelectorAll('.avatar-item').forEach(el => el.classList.remove('equipped'));
             event.currentTarget.classList.add('equipped');
         }
-
         window.addEventListener('load', loadOwnedItems);
     </script>
 </body>

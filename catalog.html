@@ -468,7 +468,7 @@
         <a href="#">Messages</a>
         <a href="#">Friends</a>
         <a href="avatar.html">Avatar</a>
-        <a href="#">Inventory</a>
+        <a href="inventory.html">Inventory</a>
         <a href="#">Trade</a>
         <a href="#">Groups</a>
         <a href="#">Forums</a>
@@ -802,6 +802,11 @@
         }
         window.addEventListener('load', loadCatalog);
         window.addEventListener('storage', loadCatalog);
+
+        // Mobile touch support for sidebar links
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('touchstart', function() {}, { passive: true });
+        });
     </script>
 </body>
 </html>
